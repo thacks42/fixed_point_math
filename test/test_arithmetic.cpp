@@ -315,8 +315,6 @@ bool test_arithmetic_comparisons(){
 }
 
 
-
-
 bool test_arithmetic(){
     bool all_passed = true;
     
