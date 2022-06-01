@@ -3,6 +3,7 @@
 #include "test_helper.hpp"
 #include "test_arithmetic.hpp"
 #include "fixed_point_math.hpp"
+#include "fixed_point_print.hpp"
 
 using namespace fixed_point;
 
@@ -92,7 +93,7 @@ bool test_int_arithmetic(){
 }
 
 
-bool test_float_arithmetic(){
+bool test_fractional_arithmetic(){
     using fs_32_16 = fixed<int32_t, 16>;
     using fs_32_24 = fixed<int32_t, 24>;
     
@@ -105,7 +106,7 @@ bool test_float_arithmetic(){
         fs_32_16 b = -2.173_fixp_t;
         auto c = a+b;
         passed &= (c == 0);
-        if(!passed) log_msg("failed 'add float' test!");
+        if(!passed) log_msg("failed 'add fractional' test!");
         all_passed &= passed;
     }
     
@@ -116,7 +117,7 @@ bool test_float_arithmetic(){
         fs_32_16 c = 4.346_fixp_t;
         auto d = a+b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'add float' test!");
+        if(!passed) log_msg("failed 'add fractional' test!");
         all_passed &= passed;
     }
     
@@ -127,7 +128,7 @@ bool test_float_arithmetic(){
         fs_32_16 c = 0.0_fixp_t;
         auto d = a-b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'sub float' test!");
+        if(!passed) log_msg("failed 'sub fractional' test!");
         all_passed &= passed;
     }
     
@@ -138,7 +139,7 @@ bool test_float_arithmetic(){
         fs_32_16 c = -5.01_fixp_t;
         auto d = a-b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'sub float' test!");
+        if(!passed) log_msg("failed 'sub fractional' test!");
         all_passed &= passed;
     }
     
@@ -149,7 +150,7 @@ bool test_float_arithmetic(){
         fs_32_24 c = -4.721929_fixp_t;
         auto d = a*b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'mul float' test!");
+        if(!passed) log_msg("failed 'mul fractional' test!");
         all_passed &= passed;
     }
     
@@ -160,7 +161,7 @@ bool test_float_arithmetic(){
         fs_32_24 c = 1.0_fixp_t;
         auto d = a/b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'div float' test!");
+        if(!passed) log_msg("failed 'div fractional' test!");
         all_passed &= passed;
     }
     
@@ -171,7 +172,7 @@ bool test_float_arithmetic(){
         fs_32_24 c = 0.30251983850758735_fixp_t;
         auto d = a/b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'div float' test!");
+        if(!passed) log_msg("failed 'div fractional' test!");
         all_passed &= passed;
     }
     
@@ -182,9 +183,78 @@ bool test_float_arithmetic(){
         fs_32_24 c = -0.30251983850758735_fixp_t;
         auto d = a/b;
         passed &= (std::abs(c.v - d.v) <= 1);
-        if(!passed) log_msg("failed 'div float' test!");
+        if(!passed) log_msg("failed 'div fractional' test!");
         all_passed &= passed;
     }
+    
+    {
+        passed = true;
+        fs_32_24 a = 12.8162_fixp_t;
+        fs_32_24 b = 3.579972066930132_fixp_t;
+        fs_32_24 c = approx_sqrt(a);
+        passed &= same_top_most_bit(b,c);
+        if(!passed) log_msg("failed 'approx sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 0.008162_fixp_t;
+        fs_32_24 b = 0.09034378783292187_fixp_t;
+        fs_32_24 c = approx_sqrt(a);
+        passed &= same_top_most_bit(b,c);
+        if(!passed) log_msg("failed 'approx sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+        {
+        passed = true;
+        fs_32_24 a = 12.8162_fixp_t;
+        fs_32_24 b = 3.579972066930132_fixp_t;
+        fs_32_24 c = approx_sqrt(a);
+        fs_32_24 d = better_approx_sqrt(a);
+        auto error_approx = b-c;
+        auto error_better = b-d;
+        passed &= (std::abs(error_approx.v) >= std::abs(error_better.v));
+        if(!passed) log_msg("failed 'approx sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 0.008162_fixp_t;
+        fs_32_24 b = 0.09034378783292187_fixp_t;
+        fs_32_24 c = approx_sqrt(a);
+        fs_32_24 d = better_approx_sqrt(a);
+        auto error_approx = b-c;
+        auto error_better = b-d;
+        passed &= (std::abs(error_approx.v) >= std::abs(error_better.v));
+        if(!passed) log_msg("failed 'approx sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+    
+    {
+        passed = true;
+        fs_32_24 a = 12.8162_fixp_t;
+        fs_32_24 b = 3.579972066930132_fixp_t;
+        fs_32_24 c = sqrt(a);
+        passed &= same_up_to_n_bits(b,c,2);
+        if(!passed) log_msg("failed 'sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 0.008162_fixp_t;
+        fs_32_24 b = 0.09034378783292187_fixp_t;
+        fs_32_24 c = sqrt(a);
+        passed &= same_up_to_n_bits(b,c,2);
+        if(!passed) log_msg("failed 'sqrt fractional' test!");
+        all_passed &= passed;
+    }
+    
+    
     
     return all_passed;
 }
@@ -251,7 +321,7 @@ bool test_arithmetic(){
     bool all_passed = true;
     
     all_passed &= test_int_arithmetic();
-    all_passed &= test_float_arithmetic();
+    all_passed &= test_fractional_arithmetic();
     all_passed &= test_arithmetic_comparisons();
     
     return all_passed;
