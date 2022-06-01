@@ -262,97 +262,12 @@ inline constexpr fixed_point_t<T, fraction> fp_from_float(float f){
     return result;
 }
 
-inline size_t gcd(size_t a, size_t b){
-    while(b != 0){
-        size_t t = b;
-        b = a % b;
-        a = t;
-    }
-    return a;
-}
-
-template<size_t S>
-inline constexpr std::pair<size_t, size_t> reduce_fractional_part(const std::array<char, S>& digits){
-    if(digits.size() == 0) return {0, 0};
-    size_t a = digits[0] - '0';
-    size_t b = 1;
-    for(size_t i = 1; i < digits.size(); i++){
-        a = a * 10 + digits[i] - '0';
-        b = b * 10;
-    }
-    size_t g = gcd(a, b);
-    
-    return {a/g, b/g};
-}
-
-
-/*
-template<typename fp_t_a, typename fp_t_b>
-bool constexpr first_type_is_more_powerful(){
-    using int_type_a = typename fp_t_a::int_type;
-    using int_type_b = typename fp_t_b::int_type;
-    
-    constexpr bool type_a_larger_than_type_b = (sizeof(int_type_a) > sizeof(int_type_b));
-    constexpr bool type_b_larger_than_type_a = (sizeof(int_type_b) > sizeof(int_type_a));
-    
-    if(type_a_larger_than_type_b) return true;
-    if(type_b_larger_than_type_a) return false;
-    
-    
-}
-*/
 
 template<typename T, size_t fraction>
 constexpr inline fixed_point_t<T, fraction> operator+(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
     return fp_from_bits<T, fraction>(a.v + b.v);
 }
 
-/*
-template<typename fp_t_a, typename fp_t_b>
-auto operator+(const fp_t_a a, const fp_t_b b){
-    
-    using int_type_a = typename fp_t_a::int_type;
-    using int_type_b = typename fp_t_b::int_type;
-    
-    constexpr bool type_a_signed = std::is_signed_v<int_type_a>;
-    constexpr bool type_b_signed = std::is_signed_v<int_type_b>;
-    
-    static_assert(type_a_signed == type_b_signed, "don't add ints of different signedness plox");
-    
-    constexpr bool type_a_larger_than_type_b = (sizeof(int_type_a) > sizeof(int_type_b));
-    
-    using larger_fp_type = std::conditional_t<type_a_larger_than_type_b, fp_t_a, fp_t_b>;
-    
-    larger_fp_type tmp_a;
-    larger_fp_type tmp_b;
-    
-    if constexpr(type_a_larger_than_type_b){
-        tmp_a = a;
-        constexpr auto frac_bits_a = fp_t_a::frac_bits();
-        constexpr auto frac_bits_b = fp_t_b::frac_bits();
-        if constexpr(frac_bits_a >= frac_bits_b){
-            tmp_b.v = b.v;
-            tmp_b.v <<= (frac_bits_a - frac_bits_b);
-        }
-        else{
-            tmp_b.v = (b.v >> (frac_bits_b - frac_bits_a));
-        }
-    }
-    else{
-        tmp_b = b;
-        constexpr auto frac_bits_a = fp_t_a::frac_bits();
-        constexpr auto frac_bits_b = fp_t_b::frac_bits();
-        if constexpr(frac_bits_b >= frac_bits_a){
-            tmp_a.v = a.v;
-            tmp_a.v <<= (frac_bits_b - frac_bits_a);
-        }
-        else{
-            tmp_a.v = (a.v >> (frac_bits_a - frac_bits_b));
-        }
-    }
-    return tmp_a + tmp_b;
-}
-*/
 
 template<typename T, size_t fraction>
 constexpr inline fixed_point_t<T, fraction> operator-(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
