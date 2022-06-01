@@ -3,9 +3,12 @@
 #include "test_ctor.hpp"
 #include "test_helper.hpp"
 #include "fixed_point_math.hpp"
+#include "fixed_point_float_conversions.hpp"
+
+using namespace fixed_point;
 
 bool test_basic_constructor(){
-    fixed_point_t<int8_t, 4> x = 5;
+    fixed<int8_t, 4> x = 5;
     return x.v == 5 << 4;
 } 
 
@@ -20,20 +23,20 @@ bool test_float_constructor(){
 }
 
 bool test_copy_constructor(){
-    fixed_point_t<int8_t, 4> x = 7;
+    fixed<int8_t, 4> x = 7;
     auto y = x;
     return x.v == y.v;
 }
 
 bool test_assignment_operator(){
-    fixed_point_t<int8_t, 4> x = 7;
-    fixed_point_t<int8_t, 4> y;
+    fixed<int8_t, 4> x = 7;
+    fixed<int8_t, 4> y;
     y = x;
     return x.v == y.v;
 }
 
 bool test_float_constant_constructor(){
-    fixed_point_t<int32_t, 16> x = 43.167_fixp_t;
+    fixed<int32_t, 16> x = 43.167_fixp_t;
     auto y = fp_from_float<int32_t, 16>(43.167f);
     return x.v == y.v;
 }

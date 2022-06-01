@@ -1,64 +1,61 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
 #include <array>
 #include <type_traits>
-#include <algorithm>
 #include <string_view>
-#include <cmath>
 #include <cassert>
-#include <fmt/core.h>
 #include <compare>
 
+namespace fixed_point{
 
-struct fixed_point_t_construction_helper{
+struct fixed_construction_helper{
     std::string_view sv;
     bool negative = false;
 };
 
 
-constexpr inline fixed_point_t_construction_helper operator "" _fixp_t(const char* str){
-    fixed_point_t_construction_helper helper{str};
+constexpr inline fixed_construction_helper operator "" _fixp_t(const char* str){
+    fixed_construction_helper helper{str};
     return helper;
 }
 
-constexpr inline fixed_point_t_construction_helper operator-(fixed_point_t_construction_helper helper){
+constexpr inline fixed_construction_helper operator-(fixed_construction_helper helper){
     helper.negative = !helper.negative;
     return helper;
 }
 
-constexpr inline fixed_point_t_construction_helper operator+(fixed_point_t_construction_helper helper){
+constexpr inline fixed_construction_helper operator+(fixed_construction_helper helper){
     return helper;
 }
 
 
 template<typename T, size_t fraction>
-struct fixed_point_t{
+struct fixed{
     using int_type = T;
     static_assert(std::is_integral_v<int_type>, "int_type must be an integer type");
     static_assert(fraction <= sizeof(int_type) * 8, "can not have more fractional bits than there are bits in the int");
     
     int_type v;
     
-    constexpr fixed_point_t(){
+    constexpr fixed(){
         v = 0;
     }
     
-    constexpr fixed_point_t(const fixed_point_t& other){
+    constexpr fixed(const fixed& other){
         v = other.v;
     }
     
-    constexpr fixed_point_t& operator=(const fixed_point_t& other){
+    constexpr fixed& operator=(const fixed& other){
         v = other.v;
         return *this;
     }
     
-    constexpr fixed_point_t(int_type i){
+    constexpr fixed(int_type i){
         v = i << frac_bits();
     }
     
-    constexpr fixed_point_t(fixed_point_t_construction_helper helper){
+    constexpr fixed(fixed_construction_helper helper){
         assert(helper.sv.size() != 0);
         
         constexpr auto is_digit = [](char c){return c >= '0' and c <= '9';};
@@ -108,18 +105,18 @@ struct fixed_point_t{
         v = result;
     }
     
-    constexpr fixed_point_t& operator=(int i){
+    constexpr fixed& operator=(int i){
         v = i << frac_bits();
         return *this;
     }
     
-    constexpr bool operator==(const fixed_point_t& other) const{
+    constexpr bool operator==(const fixed& other) const{
         return v == other.v;
     }
     
     template<typename S, size_t new_frac_bits>
-    explicit constexpr operator fixed_point_t<S, new_frac_bits>() const{
-        fixed_point_t<S, new_frac_bits> result;
+    explicit constexpr operator fixed<S, new_frac_bits>() const{
+        fixed<S, new_frac_bits> result;
         if constexpr(new_frac_bits == frac_bits()){
             result.v = static_cast<S>(v);
             return result;
@@ -225,61 +222,32 @@ struct fixed_point_t{
     }
 };
 
-template<typename fp_t>
-inline void print(const fp_t& f){
-    auto arr = f.to_string();
-    for(auto c : arr) std::cout << c;
-    std::cout << std::endl;
-}
-
 template<typename T, size_t fraction>
-inline void debug_print(fixed_point_t<T, fraction> f){
-    double d = f.to_int();
-    double frac = 0.5;
-    T frac_part = f.frac_part();
-    for(size_t i = 0; i < fraction; i++){
-        if((frac_part >> (fraction - i - 1)) & 1){
-            d += frac;
-        }
-        frac /= 2.0;
-    }
-    fmt::print("binary: {:>{}b}.{:0>{}b} as double: {:>20.12f}\n", f.to_int(), f.whole_bits(), f.frac_part(), f.frac_bits(), d);
-}
-
-template<typename T, size_t fraction>
-inline constexpr fixed_point_t<T, fraction> fp_from_bits(T i){
-    fixed_point_t<T, fraction> result;
+inline constexpr fixed<T, fraction> fp_from_bits(T i){
+    fixed<T, fraction> result;
     result.v = i;
     return result;
 }
 
-template<typename T, size_t fraction>
-inline constexpr fixed_point_t<T, fraction> fp_from_float(float f){
-    fixed_point_t<T, fraction> result;
-    T multiplier = 1 << fixed_point_t<T, fraction>::frac_bits();
-    result.v = static_cast<T>(std::round(f * multiplier));
-    return result;
-}
-
 
 template<typename T, size_t fraction>
-constexpr inline fixed_point_t<T, fraction> operator+(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
+constexpr inline fixed<T, fraction> operator+(const fixed<T, fraction> a, const fixed<T, fraction> b){
     return fp_from_bits<T, fraction>(a.v + b.v);
 }
 
 
 template<typename T, size_t fraction>
-constexpr inline fixed_point_t<T, fraction> operator-(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
+constexpr inline fixed<T, fraction> operator-(const fixed<T, fraction> a, const fixed<T, fraction> b){
     return fp_from_bits<T, fraction>(a.v - b.v);
 }
 
 template<typename T, size_t fraction>
-constexpr inline fixed_point_t<T, fraction> operator-(const fixed_point_t<T, fraction> a){
+constexpr inline fixed<T, fraction> operator-(const fixed<T, fraction> a){
     return fp_from_bits<T, fraction>(-a.v);
 }
 
 template<typename T, size_t fraction>
-constexpr inline fixed_point_t<T, fraction> operator*(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
+constexpr inline fixed<T, fraction> operator*(const fixed<T, fraction> a, const fixed<T, fraction> b){
     if constexpr(sizeof(T) <= 2){
         if constexpr(std::is_signed_v<T>){
             int32_t result = static_cast<int32_t>(a.v) * static_cast<int32_t>(b.v);
@@ -307,7 +275,7 @@ constexpr inline fixed_point_t<T, fraction> operator*(const fixed_point_t<T, fra
 }
 
 template<typename T, size_t fraction>
-constexpr inline fixed_point_t<T, fraction> operator/(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
+constexpr inline fixed<T, fraction> operator/(const fixed<T, fraction> a, const fixed<T, fraction> b){
     if constexpr(sizeof(T) <= 2){
         if constexpr(std::is_signed_v<T>){
             int32_t result = (static_cast<int32_t>(a.v) << fraction) / static_cast<int32_t>(b.v);
@@ -334,13 +302,13 @@ constexpr inline fixed_point_t<T, fraction> operator/(const fixed_point_t<T, fra
 }
 
 template<typename T, size_t fraction>
-inline constexpr std::strong_ordering operator<=>(fixed_point_t<T, fraction> a, fixed_point_t<T, fraction> b){
+inline constexpr std::strong_ordering operator<=>(fixed<T, fraction> a, fixed<T, fraction> b){
     return a.v <=> b.v;
 }
 
 
 
-
+}//end namespace fixed_point
 
 
 

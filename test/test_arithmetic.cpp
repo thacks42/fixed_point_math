@@ -4,7 +4,7 @@
 #include "test_arithmetic.hpp"
 #include "fixed_point_math.hpp"
 
-
+using namespace fixed_point;
 
 template<typename fp_t>
 bool test_add_int_impl(int ai, int bi){
@@ -54,9 +54,9 @@ bool test_mul_int_impl(int ai, int bi){
 
 
 bool test_int_arithmetic(){
-    using fs_8_4 = fixed_point_t<int8_t, 4>;
-    using fs_16_8 = fixed_point_t<int16_t, 8>;
-    using fs_32_16 = fixed_point_t<int32_t, 16>;
+    using fs_8_4 = fixed<int8_t, 4>;
+    using fs_16_8 = fixed<int16_t, 8>;
+    using fs_32_16 = fixed<int32_t, 16>;
     
     std::array arg1 = {1,2,3,7,14,23,255,1023,2016,-1,-2,-3,-7,-14,-23,-255,-1023,-2016};
     
@@ -93,8 +93,8 @@ bool test_int_arithmetic(){
 
 
 bool test_float_arithmetic(){
-    using fs_32_16 = fixed_point_t<int32_t, 16>;
-    using fs_32_24 = fixed_point_t<int32_t, 24>;
+    using fs_32_16 = fixed<int32_t, 16>;
+    using fs_32_24 = fixed<int32_t, 24>;
     
     bool all_passed = true;
     bool passed = true;
@@ -190,7 +190,7 @@ bool test_float_arithmetic(){
 }
 
 bool test_arithmetic_comparisons(){
-    using fixp = fixed_point_t<int32_t, 16>;
+    using fixp = fixed<int32_t, 16>;
     
     bool all_passed = true;
     bool passed = true;
