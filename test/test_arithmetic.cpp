@@ -122,28 +122,137 @@ bool test_float_arithmetic(){
     
     {
         passed = true;
+        fs_32_16 a = 2.173_fixp_t;
+        fs_32_16 b = 2.173_fixp_t;
+        fs_32_16 c = 0.0_fixp_t;
+        auto d = a-b;
+        passed &= (std::abs(c.v - d.v) <= 1);
+        if(!passed) log_msg("failed 'sub float' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_16 a = 2.173_fixp_t;
+        fs_32_16 b = 7.183_fixp_t;
+        fs_32_16 c = -5.01_fixp_t;
+        auto d = a-b;
+        passed &= (std::abs(c.v - d.v) <= 1);
+        if(!passed) log_msg("failed 'sub float' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
         fs_32_24 a = 2.173_fixp_t;
         fs_32_24 b = -2.173_fixp_t;
         fs_32_24 c = -4.721929_fixp_t;
         auto d = a*b;
-        
-        debug_print(a);
-        debug_print(b);
-        debug_print(c);
-        debug_print(d);
         passed &= (std::abs(c.v - d.v) <= 1);
         if(!passed) log_msg("failed 'mul float' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 2.173_fixp_t;
+        fs_32_24 b = 2.173_fixp_t;
+        fs_32_24 c = 1.0_fixp_t;
+        auto d = a/b;
+        passed &= (std::abs(c.v - d.v) <= 1);
+        if(!passed) log_msg("failed 'div float' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 2.173_fixp_t;
+        fs_32_24 b = 7.183_fixp_t;
+        fs_32_24 c = 0.30251983850758735_fixp_t;
+        auto d = a/b;
+        passed &= (std::abs(c.v - d.v) <= 1);
+        if(!passed) log_msg("failed 'div float' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_24 a = 2.173_fixp_t;
+        fs_32_24 b = -7.183_fixp_t;
+        fs_32_24 c = -0.30251983850758735_fixp_t;
+        auto d = a/b;
+        passed &= (std::abs(c.v - d.v) <= 1);
+        if(!passed) log_msg("failed 'div float' test!");
         all_passed &= passed;
     }
     
     return all_passed;
 }
 
+bool test_arithmetic_comparisons(){
+    using fixp = fixed_point_t<int32_t, 16>;
+    
+    bool all_passed = true;
+    bool passed = true;
+    
+    {
+        passed = true;
+        fixp a = 1.234_fixp_t;
+        fixp b = 1.234_fixp_t;
+        
+        passed &=  (a==b);
+        passed &= !(a!=b);
+        passed &=  (a<=b);
+        passed &=  (a>=b);
+        passed &= !(a<b);
+        passed &= !(a>b);
+        if(!passed) log_msg("failed 'arithmetic comparisons' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 5.234_fixp_t;
+        fixp b = 1.234_fixp_t;
+        
+        passed &= !(a==b);
+        passed &=  (a!=b);
+        passed &= !(a<=b);
+        passed &=  (a>=b);
+        passed &= !(a<b);
+        passed &=  (a>b);
+        if(!passed) log_msg("failed 'arithmetic comparisons' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 67.162_fixp_t;
+        fixp b = 99.112_fixp_t;
+        
+        passed &= !(a==b);
+        passed &=  (a!=b);
+        passed &=  (a<=b);
+        passed &= !(a>=b);
+        passed &=  (a<b);
+        passed &= !(a>b);
+        if(!passed) log_msg("failed 'arithmetic comparisons' test!");
+        all_passed &= passed;
+    }
+    
+    
+    return all_passed;
+}
+
+
+
+
 bool test_arithmetic(){
     bool all_passed = true;
     
     all_passed &= test_int_arithmetic();
     all_passed &= test_float_arithmetic();
+    all_passed &= test_arithmetic_comparisons();
     
     return all_passed;
 }

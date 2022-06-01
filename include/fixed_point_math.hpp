@@ -9,6 +9,8 @@
 #include <cmath>
 #include <cassert>
 #include <fmt/core.h>
+#include <compare>
+
 
 struct fixed_point_t_construction_helper{
     std::string_view sv;
@@ -220,9 +222,6 @@ struct fixed_point_t{
             frac = frac & frac_mask();
         }
         return digits;
-        
-        
-        
     }
 };
 
@@ -281,7 +280,17 @@ constexpr inline fixed_point_t<T, fraction> operator-(const fixed_point_t<T, fra
 
 template<typename T, size_t fraction>
 constexpr inline fixed_point_t<T, fraction> operator*(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
-    if constexpr(sizeof(T) <= 4){
+    if constexpr(sizeof(T) <= 2){
+        if constexpr(std::is_signed_v<T>){
+            int32_t result = static_cast<int32_t>(a.v) * static_cast<int32_t>(b.v);
+            return fp_from_bits<T, fraction>(result >> fraction);
+        }
+        else{
+            uint32_t result = static_cast<uint32_t>(a.v) * static_cast<uint32_t>(b.v);
+            return fp_from_bits<T, fraction>(result >> fraction);
+        }
+    }
+    else if constexpr(sizeof(T) <= 4){
         if constexpr(std::is_signed_v<T>){
             int64_t result = static_cast<int64_t>(a.v) * static_cast<int64_t>(b.v);
             return fp_from_bits<T, fraction>(result >> fraction);
@@ -297,7 +306,37 @@ constexpr inline fixed_point_t<T, fraction> operator*(const fixed_point_t<T, fra
     
 }
 
+template<typename T, size_t fraction>
+constexpr inline fixed_point_t<T, fraction> operator/(const fixed_point_t<T, fraction> a, const fixed_point_t<T, fraction> b){
+    if constexpr(sizeof(T) <= 2){
+        if constexpr(std::is_signed_v<T>){
+            int32_t result = (static_cast<int32_t>(a.v) << fraction) / static_cast<int32_t>(b.v);
+            return fp_from_bits<T, fraction>(result);
+        }
+        else{
+            uint32_t result = (static_cast<uint32_t>(a.v) << fraction) / static_cast<uint32_t>(b.v);
+            return fp_from_bits<T, fraction>(result);
+        }
+    }
+    else if constexpr(sizeof(T) <= 4){
+        if constexpr(std::is_signed_v<T>){
+            int64_t result = (static_cast<int64_t>(a.v) << fraction) / static_cast<int64_t>(b.v);
+            return fp_from_bits<T, fraction>(result);
+        }
+        else{
+            uint64_t result = (static_cast<uint64_t>(a.v) << fraction) / static_cast<uint64_t>(b.v);
+            return fp_from_bits<T, fraction>(result);
+        }
+    }
+    else{
+        static_assert(!std::is_same_v<T, T>, "multiplication of 64 bit fixed point numbers is not implemented, sorry");
+    }
+}
 
+template<typename T, size_t fraction>
+inline constexpr std::strong_ordering operator<=>(fixed_point_t<T, fraction> a, fixed_point_t<T, fraction> b){
+    return a.v <=> b.v;
+}
 
 
 
