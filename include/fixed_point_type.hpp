@@ -108,6 +108,7 @@ struct fixed{
         return *this;
     }
     
+    
     constexpr bool operator==(const fixed& other) const{
         return v == other.v;
     }
@@ -231,6 +232,13 @@ template<typename T, size_t fraction>
 inline constexpr fixed<T, fraction> make_fixed(T i){
     fixed<T, fraction> result;
     result.v = i << fraction;
+    return result;
+}
+
+
+template<typename T, size_t fraction>
+inline constexpr fixed<T, fraction> make_fixed(fixed_construction_helper h){
+    fixed<T, fraction> result(h);
     return result;
 }
 

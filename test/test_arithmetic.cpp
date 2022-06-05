@@ -113,6 +113,24 @@ bool test_fractional_arithmetic(){
     {
         passed = true;
         fs_32_16 a = 2.173_fixp_t;
+        auto c = a + -2.173_fixp_t;
+        passed &= (c == 0);
+        if(!passed) log_msg("failed 'add fractional' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_16 a = 2.173_fixp_t;
+        auto c = -2.173_fixp_t + a;
+        passed &= (c == 0);
+        if(!passed) log_msg("failed 'add fractional' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fs_32_16 a = 2.173_fixp_t;
         fs_32_16 b = 2.173_fixp_t;
         fs_32_16 c = 4.346_fixp_t;
         auto d = a+b;
@@ -306,6 +324,20 @@ bool test_arithmetic_comparisons(){
         passed &= !(a>=b);
         passed &=  (a<b);
         passed &= !(a>b);
+        if(!passed) log_msg("failed 'arithmetic comparisons' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 67.162_fixp_t;
+        
+        passed &= (a==67.162_fixp_t);
+        passed &= (a!=24.22_fixp_t);
+        passed &= (a<=172.95_fixp_t);
+        passed &= (a>=15.123_fixp_t);
+        passed &= (a<1123.723_fixp_t);
+        passed &= (a>17.1_fixp_t);
         if(!passed) log_msg("failed 'arithmetic comparisons' test!");
         all_passed &= passed;
     }
