@@ -4,7 +4,6 @@
 #include <bit>
 #include <array>
 #include <type_traits>
-#include <string_view>
 #include <cassert>
 #include <algorithm>
 #include <compare>
