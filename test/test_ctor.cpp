@@ -41,6 +41,12 @@ bool test_float_constant_constructor(){
     return x.v == y.v;
 }
 
+bool test_udl_constant_constructor(){
+    fixed<int32_t, 16> x = 43.167_fixp_t;
+    auto y = fp_from_float<int32_t, 16>(43.167f);
+    return x.v == y.v;
+}
+
 bool test_ctor(){
     bool all_passed = true;
     bool passed = true;
@@ -67,6 +73,10 @@ bool test_ctor(){
     
     passed = test_float_constant_constructor();
     if(!passed) log_msg("failed float constant constructor test!");
+    all_passed &= passed;
+    
+    passed = test_udl_constant_constructor();
+    if(!passed) log_msg("failed udl constant constructor test!");
     all_passed &= passed;
     
     return all_passed;

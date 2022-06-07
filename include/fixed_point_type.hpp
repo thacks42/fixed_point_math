@@ -11,23 +11,26 @@
 
 namespace fixed_point{
 
+template<size_t S>
 struct fixed_construction_helper{
-    std::string_view sv;
-    bool negative = false;
+    std::array<char, S> str;
+    bool negative;
 };
 
-
-constexpr inline fixed_construction_helper operator "" _fixp_t(const char* str){
-    fixed_construction_helper helper{str};
+template<char... str>
+constexpr inline auto operator "" _fixp_t(){
+    fixed_construction_helper<sizeof...(str)> helper{{str...}, false};
     return helper;
 }
 
-constexpr inline fixed_construction_helper operator-(fixed_construction_helper helper){
+template<size_t S>
+constexpr inline fixed_construction_helper<S> operator-(fixed_construction_helper<S> helper){
     helper.negative = !helper.negative;
     return helper;
 }
 
-constexpr inline fixed_construction_helper operator+(fixed_construction_helper helper){
+template<size_t S>
+constexpr inline fixed_construction_helper<S> operator+(fixed_construction_helper<S> helper){
     return helper;
 }
 
@@ -53,8 +56,9 @@ struct fixed{
         v = i << frac_bits();
     }
     
-    constexpr fixed(fixed_construction_helper helper){
-        assert(helper.sv.size() != 0);
+    template<size_t s>
+    constexpr fixed(fixed_construction_helper<s> helper){
+        assert(helper.str.size() != 0);
         
         constexpr auto is_digit = [](char c){return c >= '0' and c <= '9';};
         
@@ -62,8 +66,8 @@ struct fixed{
         int64_t whole = 0;
         int64_t frac = 0;
         int64_t one = 1;
-        for(size_t i = 0; i < helper.sv.size(); i++){
-            char d = helper.sv[i];
+        for(size_t i = 0; i < helper.str.size(); i++){
+            char d = helper.str[i];
             assert(d == '.' or is_digit(d));
             
             if(d != '.'){
@@ -107,7 +111,6 @@ struct fixed{
         v = i << frac_bits();
         return *this;
     }
-    
     
     constexpr bool operator==(const fixed& other) const{
         return v == other.v;
@@ -236,8 +239,8 @@ inline constexpr fixed<T, fraction> make_fixed(T i){
 }
 
 
-template<typename T, size_t fraction>
-inline constexpr fixed<T, fraction> make_fixed(fixed_construction_helper h){
+template<typename T, size_t fraction, size_t S>
+inline constexpr fixed<T, fraction> make_fixed(fixed_construction_helper<S> h){
     fixed<T, fraction> result(h);
     return result;
 }

@@ -9,14 +9,14 @@ constexpr inline fixed<T, fraction> operator+(fixed<T, fraction> a, fixed<T, fra
     return fp_from_bits<T, fraction>(a.v + b.v);
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator+(fixed<T, fraction> a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator+(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
     return a+tmp;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator+(fixed_construction_helper a, fixed<T, fraction> b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator+(fixed_construction_helper<S> a, fixed<T, fraction> b){
     fixed<T, fraction> tmp(a);
     return tmp + b;
 }
@@ -27,8 +27,8 @@ constexpr inline fixed<T, fraction>& operator+=(fixed<T, fraction>& a, fixed<T, 
     return a;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction>& operator+=(fixed<T, fraction>& a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction>& operator+=(fixed<T, fraction>& a, fixed_construction_helper<S> b){
     a = a+b;
     return a;
 }
@@ -38,14 +38,14 @@ constexpr inline fixed<T, fraction> operator-(fixed<T, fraction> a, fixed<T, fra
     return fp_from_bits<T, fraction>(a.v - b.v);
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator-(fixed<T, fraction> a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator-(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
     return a-tmp;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator-(fixed_construction_helper a, fixed<T, fraction> b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator-(fixed_construction_helper<S> a, fixed<T, fraction> b){
     fixed<T, fraction> tmp(a);
     return tmp-b;
 }
@@ -56,8 +56,8 @@ constexpr inline fixed<T, fraction>& operator-=(fixed<T, fraction>& a, fixed<T, 
     return a;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction>& operator-=(fixed<T, fraction>& a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction>& operator-=(fixed<T, fraction>& a, fixed_construction_helper<S> b){
     a = a-b;
     return a;
 }
@@ -95,14 +95,14 @@ constexpr inline fixed<T, fraction> operator*(fixed<T, fraction> a, fixed<T, fra
     
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator*(fixed<T, fraction> a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator*(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
     return a * tmp;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator*(fixed_construction_helper a, fixed<T, fraction> b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator*(fixed_construction_helper<S> a, fixed<T, fraction> b){
     fixed<T, fraction> tmp(a);
     return tmp * b;
 }
@@ -113,8 +113,8 @@ constexpr inline fixed<T, fraction>& operator*=(fixed<T, fraction>& a, fixed<T, 
     return a;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction>& operator*=(fixed<T, fraction>& a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction>& operator*=(fixed<T, fraction>& a, fixed_construction_helper<S> b){
     a = a*b;
     return a;
 }
@@ -186,14 +186,14 @@ constexpr inline fixed<T, fraction> operator/(fixed<T, fraction> a, fixed<T, fra
     return fast_division(a,b);
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator/(fixed<T, fraction> a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator/(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
     return a / tmp;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction> operator/(fixed_construction_helper a, fixed<T, fraction> b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction> operator/(fixed_construction_helper<S> a, fixed<T, fraction> b){
     fixed<T, fraction> tmp(a);
     return tmp / b;
 }
@@ -204,12 +204,42 @@ constexpr inline fixed<T, fraction>& operator/=(fixed<T, fraction>& a, fixed<T, 
     return a;
 }
 
-template<typename T, size_t fraction>
-constexpr inline fixed<T, fraction>& operator/=(fixed<T, fraction>& a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+constexpr inline fixed<T, fraction>& operator/=(fixed<T, fraction>& a, fixed_construction_helper<S> b){
     a = a/b;
     return a;
 }
 
+//TODO: which interface do we **want** for bitwise?
+//maybe **require** "from bits"?
+/*
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> operator&(fixed<T, fraction> a, fixed<T, fraction> b){
+    return fp_from_bits<T, fraction>(a.v & b.v);
+}
+
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> operator&(fixed<T, fraction> a, T b){
+    return fp_from_bits(a.v & b);
+}
+
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> operator&(T a, fixed<T, fraction> b){
+    return fp_from_bits(a & b.v);
+}
+
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> operator&=(fixed<T, fraction> a, fixed<T, fraction> b){
+    a = a & b;
+    return a;
+}
+
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> operator&=(fixed<T, fraction> a, T b){
+    a = a & b;
+    return a;
+}
+*/
 
 /*
     y = sqrt(2^n * x)
@@ -277,14 +307,14 @@ inline constexpr std::strong_ordering operator<=>(fixed<T, fraction> a, fixed<T,
 }
 
 
-template<typename T, size_t fraction>
-inline constexpr std::strong_ordering operator<=>(fixed<T, fraction> a, fixed_construction_helper b){
+template<typename T, size_t fraction, size_t S>
+inline constexpr std::strong_ordering operator<=>(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
     return a.v <=> tmp.v;
 }
 
-template<typename T, size_t fraction>
-inline constexpr std::strong_ordering operator<=>(fixed_construction_helper a, fixed<T, fraction> b){
+template<typename T, size_t fraction, size_t S>
+inline constexpr std::strong_ordering operator<=>(fixed_construction_helper<S> a, fixed<T, fraction> b){
     fixed<T, fraction> tmp(a);
     return tmp.v <=> b.v;
 }
