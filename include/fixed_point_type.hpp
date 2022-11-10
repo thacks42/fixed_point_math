@@ -17,7 +17,7 @@ struct fixed_construction_helper{
 };
 
 template<char... str>
-constexpr inline auto operator "" _fixp_t(){
+constexpr inline auto operator ""_fixp_t(){
     fixed_construction_helper<sizeof...(str)> helper{{str...}, false};
     return helper;
 }
@@ -55,8 +55,8 @@ struct fixed{
         v = i << frac_bits();
     }
     
-    template<size_t s>
-    constexpr fixed(fixed_construction_helper<s> helper){
+    template<size_t S>
+    constexpr fixed(fixed_construction_helper<S> helper){
         assert(helper.str.size() != 0);
         
         constexpr auto is_digit = [](char c){return c >= '0' and c <= '9';};

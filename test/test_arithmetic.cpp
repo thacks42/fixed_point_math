@@ -346,6 +346,60 @@ bool test_arithmetic_comparisons(){
     return all_passed;
 }
 
+bool test_arithmetic_utility_functions(){
+    using fixp = fixed<int32_t, 16>;
+    
+    bool all_passed = true;
+    bool passed = true;
+    
+    {
+        passed = true;
+        fixp a = 67.162_fixp_t;
+        passed &= abs(a) == a;
+        if(!passed) log_msg("failed 'abs' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = -67.162_fixp_t;
+        passed &= abs(a) == -a;
+        if(!passed) log_msg("failed 'abs' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 14.916_fixp_t;
+        fixp b = 12.763_fixp_t;
+        fixp c = 67.162_fixp_t;
+        passed &= clamp(a,b,c) == a;
+        if(!passed) log_msg("failed 'clamp' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 11.916_fixp_t;
+        fixp b = 12.763_fixp_t;
+        fixp c = 67.162_fixp_t;
+        passed &= clamp(a,b,c) == b;
+        if(!passed) log_msg("failed 'clamp' test!");
+        all_passed &= passed;
+    }
+    
+    {
+        passed = true;
+        fixp a = 74.916_fixp_t;
+        fixp b = 12.763_fixp_t;
+        fixp c = 67.162_fixp_t;
+        passed &= clamp(a,b,c) == c;
+        if(!passed) log_msg("failed 'clamp' test!");
+        all_passed &= passed;
+    }
+    
+    return all_passed;
+}
 
 bool test_arithmetic(){
     bool all_passed = true;
@@ -353,6 +407,7 @@ bool test_arithmetic(){
     all_passed &= test_int_arithmetic();
     all_passed &= test_fractional_arithmetic();
     all_passed &= test_arithmetic_comparisons();
+    all_passed &= test_arithmetic_utility_functions();
     
     return all_passed;
 }

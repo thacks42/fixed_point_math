@@ -9,6 +9,7 @@ constexpr inline fixed<T, fraction> operator+(fixed<T, fraction> a, fixed<T, fra
     return fp_from_bits<T, fraction>(a.v + b.v);
 }
 
+
 template<typename T, size_t fraction, size_t S>
 constexpr inline fixed<T, fraction> operator+(fixed<T, fraction> a, fixed_construction_helper<S> b){
     fixed<T, fraction> tmp(b);
@@ -325,6 +326,13 @@ constexpr inline fixed<T, fraction> abs(fixed<T, fraction> a){
     fixed<T, fraction> result;
     result.v = std::abs(a.v);
     return result;
+}
+
+template<typename T, size_t fraction>
+constexpr inline fixed<T, fraction> clamp(fixed<T, fraction> a, fixed<T, fraction> b, fixed<T, fraction> c){
+    if(a < b) return b;
+    if(a > c) return c;
+    return a;
 }
 
 }//end namespace fixed_point
