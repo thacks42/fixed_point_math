@@ -13,12 +13,56 @@ namespace fixed_point{
 template<size_t S>
 struct fixed_construction_helper{
     std::array<char, S> str;
+    int64_t whole;
+    uint64_t frac;
     bool negative;
 };
 
 template<char... str>
-constexpr inline auto operator ""_fixp_t(){
-    fixed_construction_helper<sizeof...(str)> helper{{str...}, false};
+consteval inline auto operator ""_fixp_t(){
+    fixed_construction_helper<sizeof...(str)> helper{{str...}, false, 0, 0};
+    assert(helper.str.size() != 0);
+    
+    constexpr auto is_digit = [](char c){return c >= '0' and c <= '9';};
+    
+    bool before_dot = true;
+    int64_t whole = 0;
+    uint64_t frac = 0;
+    uint64_t one = 1;
+    for(size_t i = 0; i < helper.str.size(); i++){
+        char d = helper.str[i];
+        assert(d == '.' or is_digit(d));
+        
+        if(d != '.'){
+            if(before_dot){
+                int64_t current_digit = static_cast<int64_t>(d - '0');
+                whole *= 10;
+                whole += current_digit;
+                
+            }
+            else{
+                int64_t current_digit = static_cast<int64_t>(d - '0');
+                frac *= 10;
+                frac += current_digit;
+                one *= 10;
+            }
+        }
+        else{
+            before_dot = false;
+        }
+    }
+    uint64_t bin_frac = 0;
+    for(int i = 0; i < 64; i++){
+        bin_frac <<= 1;
+        frac <<= 1;
+        if(frac >= one){
+            bin_frac |= 1;
+            frac -= one;
+        }
+    }
+
+    helper.whole = whole;
+    helper.frac = bin_frac;
     return helper;
 }
 
@@ -57,51 +101,10 @@ struct fixed{
     
     template<size_t S>
     constexpr fixed(fixed_construction_helper<S> helper){
-        assert(helper.str.size() != 0);
-        
-        constexpr auto is_digit = [](char c){return c >= '0' and c <= '9';};
-        
-        bool before_dot = true;
-        int64_t whole = 0;
-        int64_t frac = 0;
-        int64_t one = 1;
-        for(size_t i = 0; i < helper.str.size(); i++){
-            char d = helper.str[i];
-            assert(d == '.' or is_digit(d));
-            
-            if(d != '.'){
-                if(before_dot){
-                    int64_t current_digit = static_cast<int64_t>(d - '0');
-                    whole *= 10;
-                    whole += current_digit;
-                    
-                }
-                else{
-                    int64_t current_digit = static_cast<int64_t>(d - '0');
-                    frac *= 10;
-                    frac += current_digit;
-                    one *= 10;
-                }
-            }
-            else{
-                before_dot = false;
-            }
-        }
-        
-        int64_t result = whole;
-        for(size_t i = 0; i < fraction; i++){
-            result <<= 1;
-            frac *= 2;
-            if(frac >= one){
-                result |= 1;
-                frac -= one;
-            }
-        }
-        
-        if(frac * 2 > one){
-            result |= 1;
-        }
-        
+    
+        int64_t result = (helper.whole << fraction) | (helper.frac >> (64 - fraction));
+        if((helper.frac >> (64-fraction-1)) & 1) result++;
+
         if(helper.negative) result = -result;
         v = result;
     }

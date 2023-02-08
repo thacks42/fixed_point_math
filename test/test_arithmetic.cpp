@@ -168,6 +168,8 @@ bool test_fractional_arithmetic(){
         fs_32_24 c = -4.721929_fixp_t;
         auto d = a*b;
         passed &= (std::abs(c.v - d.v) <= 1);
+        log_msg(std::to_string(d.v));
+        log_msg(std::to_string(c.v));
         if(!passed) log_msg("failed 'mul fractional' test!");
         all_passed &= passed;
     }
