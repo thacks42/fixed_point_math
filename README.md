@@ -12,6 +12,7 @@ supported features so far:
 * construction from user defined literals
 * conversion from/to strings
 * utility functions to access the internal bit representation
+* compiles to "the correct assembly" on both gcc and clang using `O1` and up.
 
 
 # Example usage
